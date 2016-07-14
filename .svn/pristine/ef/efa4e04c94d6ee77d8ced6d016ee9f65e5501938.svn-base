@@ -1,0 +1,122 @@
+package Game;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferStrategy;
+
+import Characters.Player;
+import Inputs.KeyManager;
+import Levels.LevelManager;
+import Window.Display;
+
+public class Game implements Runnable {
+
+	private Display display;
+	private Thread thread;
+	private int width, height;
+	private String title;
+	private Player player;
+	private LevelManager levelManager;
+	private KeyManager keyManager;
+	
+	private BufferStrategy bs;
+	private Graphics2D g;
+	
+	private boolean running = false;
+	
+	public Game(String title, int width, int height){
+		this.title = title;
+		this.width = width;
+		this.height = height;
+		keyManager = new KeyManager();
+	}
+	
+	private void init(){
+		display = new Display(title, width, height);
+		display.getFrame().addKeyListener(keyManager);
+		levelManager = new LevelManager(this);
+		levelManager.setLevelInit();
+		player = new Player(this, levelManager.getLevel().getSpawnPlayerX(), levelManager.getLevel().getSpawnPlayerY());
+	}
+	
+	@Override
+	public void run() {
+		init();
+		int fps = 60;
+		double timePerTick = 1000000000/ fps;
+		double delta = 0;
+		long now;
+		long lastTime = System.nanoTime();
+		long timer = 0;
+		int ticks = 0;
+		while(running){
+			now = System.nanoTime();
+			delta += (now - lastTime)/timePerTick;
+			timer += now - lastTime;
+			lastTime = now;
+			if(delta >= 1){
+				tick();
+				render();
+				ticks++;
+				delta--;
+			}
+			if(timer >= 1000000000){
+//				System.out.println("FPS: " + ticks);
+				ticks = 0;
+				timer = 0;
+			}
+		}
+		stop();
+	}
+	
+	private void tick(){
+		keyManager.tick();
+		player.tick();
+		levelManager.changeLevel();
+	}
+	
+	private void render(){
+		bs = display.getCanvas().getBufferStrategy();
+		if (bs == null) {
+			display.getCanvas().createBufferStrategy(3);
+			return;
+		}
+		g = (Graphics2D) bs.getDrawGraphics();
+		g.clearRect(0, 0, width, height);
+		
+		
+		//depending on state use different render methods
+		
+		//test
+		levelManager.getLevel().render(g);
+		player.render(g);
+		
+		
+		//always have this
+		bs.show();
+		g.dispose();
+	}
+	
+	public synchronized void start(){
+		running = true;
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	public synchronized void stop() {
+		running = false;
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public KeyManager getKeyManager(){
+		return keyManager;
+	}
+	
+	public LevelManager getLevelManager(){
+		return levelManager;
+	}
+
+}

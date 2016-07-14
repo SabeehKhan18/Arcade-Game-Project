@@ -1,0 +1,423 @@
+package Game;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
+
+import Characters.Centipede;
+import Characters.Flea;
+import Characters.Movable;
+import Characters.Mushroom;
+import Characters.Player;
+import Characters.Scorpion;
+import Characters.Spider;
+import Inputs.KeyManager;
+import Inputs.MouseInput;
+import Levels.LevelManager;
+import Weapons.Weapon;
+import Window.Display;
+import Window.Menu;
+import Window.ScoreScreen;
+
+public class Game implements Runnable {
+
+	private Display display;
+	private Thread thread;
+	private int width, height, score;
+	private String title, scoreStr, livesLeft;
+	private Player player;
+	private Centipede centi;
+	private Scorpion scorpio;
+	private Spider spydi;
+	private Flea flea;
+	private LevelManager levelManager;
+	private KeyManager keyManager;
+	private ArrayList<Movable> movers;
+	private ArrayList<Movable> moversToAdd;
+	private ArrayList<Movable> moversToRemove;
+	
+	private int mushroomCount;
+	
+	private final long STARTTIME;
+	private final long SCORPIONSPAWNTIME = 1000, SPIDERSPAWNTIME = 5000;
+	
+	private BufferStrategy bs;
+	private Graphics2D g;
+	private Menu menu;
+	private ScoreScreen ss;
+	
+	private boolean running = false;
+	private boolean hasWeapon, hasCentipede;
+	private boolean isPaused;
+	
+	public enum State {
+		MENU, GAME, HELP, EXIT, SCORESCREEN
+		}
+	
+	private State state = State.MENU;
+	
+	public Game(String title, int width, int height){
+		this.title = title;
+		this.width = width;
+		this.height = height;
+		keyManager = new KeyManager(this);
+		this.STARTTIME = System.currentTimeMillis();
+		this.mushroomCount = 0;
+		this.isPaused = false;
+		this.score = 0;
+		this.scoreStr = "";
+		this.livesLeft = "0";
+	}
+	
+	private void init(){
+		display = new Display(title, width, height);
+		display.getFrame().addKeyListener(keyManager);		
+		menu = new Menu(this);
+		ss = new ScoreScreen(this);
+		display.getCanvas().addMouseListener(new MouseInput(this));
+		levelManager = new LevelManager(this);
+		levelManager.setLevelInit();
+		this.hasCentipede = true;
+		player = new Player(this, levelManager.getLevel().getSpawnPlayerX(), levelManager.getLevel().getSpawnPlayerY());
+		centi = new Centipede(this, levelManager.getLevel().getSpawnCentX(),levelManager.getLevel().getSpawnCentY(), 8);
+		
+		movers = new ArrayList<Movable>();
+		moversToAdd = new ArrayList<Movable>();
+		moversToRemove = new ArrayList<Movable>();
+		
+		movers.add(player);
+		movers.add(centi);
+		
+		// this.mushroomCount = getLevelManager().getLevel().getMushroomCount();
+		Sprites.init();
+		levelManager.getLevel().render(g);
+	}
+	
+	public void loadLevel() {
+		this.resetLevel();
+		this.levelManager.changeLevel();
+	}
+	
+	public void resetLevel() {
+		for (Movable m : this.movers) {
+			this.removeMovable(m);
+		}
+		player = new Player(this, levelManager.getLevel().getSpawnPlayerX(), levelManager.getLevel().getSpawnPlayerY());
+		centi = new Centipede(this, levelManager.getLevel().getSpawnCentX(),levelManager.getLevel().getSpawnCentY(), 8);
+		movers.add(player);
+		movers.add(centi);
+		this.levelManager.getLevel().render(g);
+	}
+	
+	@Override
+	public void run() {
+		init();
+		int fps = 60;
+		double timePerTick = 1000000000/ fps;
+		double delta = 0;
+		long now;
+		long lastTime = System.nanoTime();
+		long timer = 0;
+		int ticks = 0;
+		while(running){
+			now = System.nanoTime();
+			delta += (now - lastTime)/timePerTick;
+			timer += now - lastTime;
+			lastTime = now;
+			if(delta >= 1){
+				
+				if (!this.isPaused) {
+					tick();
+					collide();
+					render();
+				} if(this.isPaused){
+					render();
+				}
+				ticks++;
+				delta--;
+			}
+			
+			if(timer >= 1000000000){
+				ticks = 0;
+				timer = 0;
+			}
+		
+		}
+		stop();
+	}
+	
+	private void tick(){
+		if (state == State.GAME){
+		keyManager.tick();
+		if (this.keyManager.level_up || this.keyManager.level_down) {
+			this.loadLevel();
+		}
+		
+//		this.movers.addAll(0, this.moversToAdd);
+		this.movers.addAll(this.moversToAdd);
+		this.moversToAdd.clear();
+		this.movers.removeAll(this.moversToRemove);
+		this.moversToRemove.clear();
+		
+		// Add a new scorpion and spider
+		// after a certain amount of time
+		long diff = System.currentTimeMillis() - this.STARTTIME;
+		if (diff % this.SCORPIONSPAWNTIME <= 20 &&
+				!this.movers.contains(scorpio) &&
+				diff > this.SCORPIONSPAWNTIME) {
+			this.scorpio = new Scorpion(this);
+			this.movers.add(this.scorpio);
+		}
+		if (diff % this.SPIDERSPAWNTIME <= 40 &&
+				!this.movers.contains(spydi) && 
+				diff > this.SPIDERSPAWNTIME) {
+			this.spydi = new Spider(this);
+			this.movers.add(this.spydi);
+		}
+		
+		if (this.lessThan5Mushrooms() && !this.movers.contains(flea)) {
+			this.flea = new Flea(this);
+			this.movers.add(flea);
+		}
+		
+		for (Movable p : this.movers) {
+			p.tick();
+		}
+		
+		if(player.getIsDead()){
+			for (Movable m :this.movers) {
+//				if (!m.getClass().getSuperclass().equals(Weapon.class) && !m.getClass().equals(Mushroom.class))
+				if (!m.getClass().equals(Mushroom.class)) {
+					m.die();
+				}
+				else {
+					((Mushroom)m).revive();
+				}
+			}
+			player.setAlive();
+			Centipede ce = new Centipede(this, levelManager.getLevel().getSpawnCentX(),levelManager.getLevel().getSpawnCentY(), 8);
+			movers.add(ce);
+		}
+		if(player.getDeathCount() == 3 || this.getState() == State.SCORESCREEN){
+			this.setState(State.SCORESCREEN);
+			this.resetLevel();
+			this.levelManager.setLevelInit();
+		}
+		
+		livesLeft = String.valueOf(3 - player.getDeathCount());
+		} else if (state == State.MENU) {
+			// Nothing to do here
+		} else if (state == State.HELP) {
+			// Nothing to do here
+		} else if (state == State.EXIT) {
+			System.exit(0);	
+		} else if (state == State.SCORESCREEN) {
+			// Nothing to do here
+		}		
+	}
+	
+	private void render(){
+		
+		bs = display.getCanvas().getBufferStrategy();
+		if (bs == null) {
+			display.getCanvas().createBufferStrategy(3);
+			return;
+		}
+		g = (Graphics2D) bs.getDrawGraphics();
+		g.clearRect(0, 0, width, height);
+		g.setColor(Color.black);
+		g.fillRect(0, 0, width, height);
+		
+		if (state == State.GAME) {
+		for (Movable p : this.movers) {
+			p.render(g);
+		}
+		
+		if (isPaused) {
+			g.setColor(Color.white);
+			g.scale(4, 4);
+			g.drawString("PAUSED", 630/8, 800/8);
+			g.setColor(Color.white);
+			g.scale(3, 3);
+			g.drawString("Score: " + scoreStr.valueOf(score), 0, 276);
+			g.drawString("Lives Left: " + livesLeft, 202, 276);
+		}
+		
+		g.setColor(Color.white);
+		g.scale(3, 3);
+		g.drawString("Score: " + scoreStr.valueOf(score), 0, 276);
+		g.drawString("Lives Left: " + livesLeft, 202, 276);
+		} else if (state == State.MENU) {
+			this.menu.render(bs.getDrawGraphics());
+		} else if (state == State.HELP) {
+						
+		} else if (state == State.EXIT) {
+			
+		} else if (state == State.SCORESCREEN) {
+			this.ss.render(g);
+		}
+		//always have this
+		bs.show();
+		g.dispose();
+		
+	}
+	
+	public void collide() {
+		this.hasWeapon = false; this.hasCentipede = false;
+		int moversLength = this.movers.size();
+		for (int i = 0; i < moversLength; i++) {
+			Movable thisMovable = this.movers.get(i);
+			if (thisMovable.getClass().getSuperclass().equals(Weapon.class)) {
+				this.hasWeapon = true;
+			}
+			else if (thisMovable.getClass().equals(Centipede.class)) {
+				this.hasCentipede = true;
+			}
+			for (int j = i+1; j < moversLength; j++) {
+				Movable thatMovable = this.movers.get(j);
+				if (thisMovable.getBounds().intersects(thatMovable.getBounds())) {
+					thisMovable.collide(thatMovable);
+					if(thatMovable.getClass().equals(Mushroom.class) && thisMovable.getClass().getSuperclass().equals(Weapon.class)){
+						score += 10;
+					}
+					if(thatMovable.getClass().equals(Centipede.class) && thisMovable.getClass().getSuperclass().equals(Weapon.class)){
+						score += 100;
+					}
+					if(thatMovable.getClass().equals(Flea.class) && thisMovable.getClass().getSuperclass().equals(Weapon.class)){
+						score += 50;
+					}
+					if(thatMovable.getClass().equals(Spider.class) && thisMovable.getClass().getSuperclass().equals(Weapon.class)){
+						score += 80;
+					}
+					if(thatMovable.getClass().equals(Scorpion.class) && thisMovable.getClass().getSuperclass().equals(Weapon.class)){
+						score += 20;
+					}
+				}
+			}
+		}
+		if (!this.hasCentipede) {
+			this.levelManager.nextLevel();
+			this.resetLevel();
+		}
+	}
+	
+	public synchronized void start(){
+		running = true;
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	public synchronized void stop() {
+		running = false;
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void win() {
+		this.isPaused = true;
+		g.setColor(Color.white);
+		g.scale(4, 4);
+		g.drawString("YOU WIN!", 630/8, 800/8);
+	}
+	
+	public boolean isInsideWindowX(Point2D point) {
+		return point.getX() >= 0 && point.getX() <= this.width;
+	}
+
+	public boolean isInsideWindowY(Point2D point) {
+		return point.getY() >= 0 && point.getY() <= this.height;
+	}
+
+	public boolean isInsideWindow(Point2D point) {
+		return isInsideWindowX(point) && isInsideWindowY(point);
+	}
+	
+	public boolean isInsidePlayerArea(Point2D point) {
+		return point.getY() >= 800 - 32*10 && point.getY() <= this.height;
+	}
+	
+	public KeyManager getKeyManager(){
+		return keyManager;
+	}
+	
+	public LevelManager getLevelManager(){
+		return levelManager;
+	}
+	
+	public void addMovable(Movable m) {
+		if (m.getClass().equals(Mushroom.class)) {
+			this.moversToAdd.add(m);
+			return;
+		}
+		this.moversToAdd.add(0,m);
+	}
+	
+	public void removeMovable(Movable m) {
+		this.moversToRemove.add(m);
+	}
+	
+	public Player getPlayer() {
+		return player;
+	}
+	
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int getHeight() {
+		return this.height;
+	}
+	
+	public boolean hasWeapon() {
+		return this.hasWeapon;
+	}
+	
+	public void createMushroom(int x, int y) {
+		addMovable(new Mushroom(this,x,y));
+	}
+	
+	public int getMushroomInPlayerArea() {
+		return this.mushroomCount;
+	}
+	
+	public void numMushroomsDelta(int delta) {
+		this.mushroomCount += delta;
+	}
+	
+	private boolean lessThan5Mushrooms() {
+		return this.mushroomCount <= 5;
+	}
+	
+	public void togglePaused() {
+		this.isPaused = !this.isPaused;
+	}
+	
+	public State getState() {
+		return this.state;
+	}
+	
+	public void setState(State state){
+		this.state = state;
+	}
+	
+	public Display getDisplay() {
+		return this.display;
+	}
+	
+	public int getScore() {
+		return this.score;
+	}
+	
+	public Menu getMenu() {
+		return this.menu;
+	}
+	
+	public ScoreScreen getScoreScreen() {
+		return this.ss;
+	}
+}

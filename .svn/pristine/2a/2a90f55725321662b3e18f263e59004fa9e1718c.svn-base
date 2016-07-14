@@ -1,0 +1,8 @@
+By the end of cycle 2, we have added the following:
+1.) We believe to have solved most of our collision problems. We still need to fix some 
+problems with movables hitting the edge of the board. 3 hours
+2.) We are able to destroy the mushrooms with 4 hits. .5 hour
+3.) The player dies when the centipede hits the player. .5 hour
+4.) The head of the centipede dies a bullet hits the head of the centipede. 2 hours
+5.) Centipede motion almost completed, few bugs when hitting mushrooms. 4 hours 
+

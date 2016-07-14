@@ -1,0 +1,11 @@
+package Weapons;
+
+import Characters.Movable;
+
+
+public interface Projectile extends Movable {
+	
+	@Override
+	public void tick();
+	
+}

@@ -1,0 +1,43 @@
+package Window;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+
+public class Help {
+	
+	@SuppressWarnings("unused")
+	private Game game;
+	private Rectangle back;
+	
+	public Help(Game game) {
+		this.game = game;
+		this.back = new Rectangle(600,600,150,50);
+	}
+	
+	public void render(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
+		Font fnt0 = new Font("calibri",Font.BOLD,22);
+		g2.setFont(fnt0);
+		
+		g2.setColor(Color.WHITE);
+		g2.drawString("Use the arrow keys to move the player around.", 100, 100);
+		g2.drawString("Spacebar is used to shoot the current weapon.", 100, 120);
+		g2.drawString("Use numbers 1, 2, and 3 to select different weapons. ", 100, 140);
+		g2.drawString("U and D will change between levels. P is for pause. ", 100, 160);
+		Font fnt1 = new Font("Times New Roman",Font.ITALIC, 50);
+		g2.setFont(fnt1);
+		g2.drawString("BACK", this.back.x, this.back.y+this.back.height);
+		g2.setColor(Color.black);
+		g2.draw(this.back);
+	}
+	
+	public Rectangle getBackButton() {
+		return this.back;
+	}
+
+}

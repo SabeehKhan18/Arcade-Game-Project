@@ -1,0 +1,58 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+import Game.Game;
+
+public class Player {
+
+	private Game game;
+	private float x, y;
+	private int speed;
+	
+	public Player(Game game, int xSpawn, int ySpawn){
+		this.game = game;
+		this.x = xSpawn;
+		this.y = ySpawn;
+		this.speed = 3;
+	}
+	
+	public void tick() {
+		move();
+	}
+	
+	public void render(Graphics2D g){
+		g.setColor(Color.black);
+		g.fillRect((int)x, (int)y, 32, 32);
+		System.out.println(x + "x    y" + y);
+	}
+	
+	public void move() {
+		if (game.getKeyManager().up) {
+			y -= speed;
+		}
+		if (game.getKeyManager().down) {
+			y += speed;
+		}
+		if (game.getKeyManager().left) {
+			x -= speed;
+		}
+		if (game.getKeyManager().right) {
+			x += speed;
+		}
+	}
+	
+	public void shoot(){
+		
+	}
+	
+	public void die(){
+		
+	}
+	
+	public void changeWeapon(){
+		
+	}
+
+}

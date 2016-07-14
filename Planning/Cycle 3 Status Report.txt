@@ -1,0 +1,9 @@
+Features implemented:
+1.) All other monsters. Moderately difficult. 4 hours.
+2.) Other two weapons and changing between them. Difficult 3 hours. 
+3.) Death count. difficult due to fields being shared between many classes. 1.5 hours. 
+4.) Poison mushrooms. They change color. Easy. .5 hours. 
+5.) Level rendering. Kill everything and reinstantied level. Easy.5 hours.
+6.) Pause. Pretty easy, just stopped rendering and ticking game. 5 hours.
+
+Still need to implement centipede dropping down to the player's area. 

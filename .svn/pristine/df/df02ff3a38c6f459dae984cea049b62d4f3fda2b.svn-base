@@ -1,0 +1,48 @@
+package Game;
+
+import Window.Display;
+
+public class Game implements Runnable {
+
+	private Display display;
+	private Thread thread;
+	private int width, height;
+	private String title;
+	
+	private boolean running = false;
+	
+	public Game(String title, int width, int height){
+		this.title = title;
+		this.width = width;
+		this.height = height;
+	}
+	
+	private void init(){
+		display = new Display(title, width, height);
+	}
+	
+	@Override
+	public void run() {
+		init();
+		while(running){
+			System.out.println("RIP");
+		}
+		stop();
+	}
+	
+	public synchronized void start(){
+		running = true;
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	public synchronized void stop() {
+		running = false;
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+}

@@ -1,0 +1,42 @@
+package Characters;
+
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+import Weapons.Blaster;
+
+public abstract class Movable {
+	
+	protected Game game;
+	
+	public Movable(Game game) {
+		this.game = game;
+	}
+	
+	public abstract void tick();
+	
+	public abstract void render(Graphics2D g);
+	
+	public void die() {
+		this.game.removeMovable(this);
+	}
+	
+	public abstract Rectangle getBounds();
+	
+	public abstract void collide(Movable m);
+	
+	public abstract void collideWithPlayer(Player p);
+	
+	public abstract void collideWithMushroom(Mushroom m);
+	
+	public abstract void collideWithCentipede(Centipede c);
+	
+	public abstract void collideWithBlaster(Blaster b);
+	
+	public abstract void collideWithScorpion(Scorpion s);
+	
+	public abstract void collideWithSpider(Spider sp);
+	
+}
+	

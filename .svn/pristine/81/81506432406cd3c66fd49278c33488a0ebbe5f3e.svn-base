@@ -1,0 +1,94 @@
+package Levels;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+import Game.Game;
+import Helpers.Utils;
+
+public class Level {
+	
+	private int spawnCentX, spawnCentY, spawnPlayerX, spawnPlayerY;
+	private Game game;
+	private int[][] tiles;
+	
+	public Level(Game game, String path){
+		this.game = game;
+		loadLevel(path);
+	}
+	
+	public void render(Graphics2D g) {
+		//render map
+		for (int y = 0; y < 25; y++) {
+			for (int x = 0; x < 25; x++) {
+				if(tiles[x][y] == 1){
+					g.setColor(Color.red);
+					g.fillRect(x*32, y*32, 32, 32);
+				}
+			}
+		}
+		//then render player and centipede on top (temp code)
+//		g.setColor(Color.black);
+//		g.fillRect(spawnPlayerX*32, spawnPlayerY*32, 32, 32);
+		g.setColor(Color.green);
+		g.fillRect(spawnCentX*32, spawnCentY*32, 32, 32);
+	}
+	
+	private void loadLevel(String path){
+		String level = Utils.loadFileAsString(path);
+		spawnPlayerX = Integer.parseInt(level.substring(0, 2));
+		spawnPlayerY = Integer.parseInt(level.substring(3, 5));
+		spawnCentX = Integer.parseInt(level.substring(5, 7));
+		spawnCentY = Integer.parseInt(level.substring(8, 10));
+
+		tiles = new int[25][25];
+		for (int y = 0; y < 25; y++) {
+			for (int x = 0; x < 25; x++) {
+				tiles[x][y] = Integer.parseInt(level.substring(10+x+(y*25), 11+x+(y*25)));
+			}
+		}
+	}
+
+	//getters and setters
+	public int getSpawnCentX() {
+		return this.spawnCentX;
+	}
+
+	public void setSpawnCentX(int spawnCentX) {
+		this.spawnCentX = spawnCentX;
+	}
+
+	public int getSpawnCentY() {
+		return this.spawnCentY;
+	}
+
+	public void setSpawnCentY(int spawnCentY) {
+		this.spawnCentY = spawnCentY;
+	}
+
+	public int getSpawnPlayerX() {
+		return this.spawnPlayerX*32;
+	}
+
+	public void setSpawnPlayerX(int spawnPlayerX) {
+		this.spawnPlayerX = spawnPlayerX;
+	}
+
+	public int getSpawnPlayerY() {
+		return this.spawnPlayerY*32;
+	}
+
+	public void setSpawnPlayerY(int spawnPlayerY) {
+		this.spawnPlayerY = spawnPlayerY;
+	}
+
+	public int[][] getTiles() {
+		return this.tiles;
+	}
+
+	public void setTiles(int[][] tiles) {
+		this.tiles = tiles;
+	}
+	
+
+}

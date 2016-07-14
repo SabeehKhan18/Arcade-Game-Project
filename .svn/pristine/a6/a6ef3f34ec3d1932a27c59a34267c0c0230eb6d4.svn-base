@@ -1,0 +1,159 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+import Weapons.Blaster;
+
+public class Player extends Movable {
+
+	private int x,y;
+	private int lastX, lastY;
+	private int speed;
+	private String weapon, direction, dir2;
+	private boolean isMoveValid;
+	
+	public Player(Game game, int xSpawn, int ySpawn){
+		super(game);
+		this.x = xSpawn; this.y = ySpawn;
+		this.lastX = this.x; this.lastY = this.y;
+		this.speed = 3;
+		this.isMoveValid = true;
+	}
+	
+	@Override
+	public void tick() {
+		move();
+	}
+	
+	@Override
+	public void render(Graphics2D g){
+		if (!this.isMoveValid) {
+			this.x = this.lastX;
+			this.y = this.lastY;
+		}
+		g.setColor(Color.black);
+		g.fillRect(x, y, 32, 32);
+	}
+	
+	public void move() {
+		this.isMoveValid = true;
+		this.lastX = this.x;
+		this.lastY = this.y;
+		if (game.getKeyManager().up) {
+			y -= speed;
+		}
+		if (game.getKeyManager().down) {
+			y += speed;
+			
+		}
+		if (game.getKeyManager().left) {
+			x -= speed;
+			
+		}
+		if (game.getKeyManager().right) {
+			x += speed;
+		}
+		if (this.y < 800-(10*32) || this.y > 800-32 || this.x < 0 || this.x > 800-32) {
+			this.isMoveValid = false;
+		}
+	}
+	
+	public void shoot(){
+//		if (!this.game.hasWeapon()) {
+//			Blaster m = new Blaster(game, x, y);
+//			game.addMovable(m);
+//		}
+		Blaster m = new Blaster(game, x, y);
+		game.addMovable(m);
+		/*
+		try {
+			// Get the Class for the Ball
+			Class<? extends Projectile> projectileClass;
+			try {
+				projectileClass = Class.forName(this.weapon).asSubclass(Projectile.class);
+			} catch (ClassCastException e) {
+				// Oops. It's not a subclass of Ball.
+				throw new ClassCastException("Not a subclass of Projectile");
+			} catch (NoClassDefFoundError e) {
+				throw new NoClassDefFoundError("Class not defined");
+			}
+
+			// Make sure it is not abstract
+			if (Modifier.isAbstract(projectileClass.getModifiers())) {
+				System.out.println("Class is abstract");
+				return;
+			}
+
+			// Use reflection to get the Ball's constructor.
+			Constructor<? extends Projectile> constructor;
+			Class<?>[] parameters = { Projectile.class };
+			constructor = projectileClass.getConstructor(parameters);
+
+			// Construct a new instance of the ball and add it to the
+			// environment
+			Projectile b = constructor.newInstance(new Point2D.Double(this.x, this.y));
+			// this.game.addProjectile(b);
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			System.out.println("Could not create projectile");
+			
+		}
+		*/
+
+	}
+	
+	public void changeWeapon(){
+		
+	}
+	
+	public void setIsMoveValid(boolean value) {
+		this.isMoveValid = value;
+	}
+
+	@Override
+	public void collide(Movable m) {
+		m.collideWithPlayer(this);
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		// Nothing to do here
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		this.setIsMoveValid(false);
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		this.die();
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		return new Rectangle(x,y,32,32);
+	}
+
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+}

@@ -1,0 +1,87 @@
+package Inputs;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import Game.Game;
+import Game.Game.State;
+import Window.Menu;
+import Window.ScoreScreen;
+
+public class MouseInput implements MouseListener {
+	private Menu menu;
+	private Game game;
+	private ScoreScreen ss;
+	
+	public MouseInput(Game game) {
+		this.game = game;
+		this.menu = game.getMenu();
+		this.ss = game.getScoreScreen();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+		int mx = e.getX();
+		int my = e.getY();
+		if (game.getState() == State.MENU) {
+			// Play Button
+			if (mx >= menu.getPlayButton().getMinX() && mx <= menu.getPlayButton().getMaxX()
+					&& my >= menu.getPlayButton().getMinY() 
+					&& my <= menu.getPlayButton().getMaxY()) {
+				game.setState(State.GAME);
+			}
+			// Help Button
+			if (mx >= menu.getHelpButton().getMinX() && mx <= menu.getHelpButton().getMaxX()
+					&& my >= menu.getHelpButton().getMinY() 
+					&& my <= menu.getHelpButton().getMaxY()) {
+				game.setState(State.HELP);
+			}
+			// Quit Button
+			if (mx >= menu.getQuitButton().getMinX() && mx <= menu.getQuitButton().getMaxX()
+					&& my >= menu.getQuitButton().getMinY() 
+					&& my <= menu.getQuitButton().getMaxY()) {
+				game.setState(State.EXIT);
+			}
+		}
+		if (game.getState() == State.SCORESCREEN) {
+			//ScoreScreen toHome
+			if (mx >= ss.getToHome().getMinX() && mx <= ss.getToHome().getMaxX()
+					&& my >= ss.getToHome().getMinY() 
+					&& my <= ss.getToHome().getMaxY()) {
+				game.setState(State.MENU);
+			}
+			//ScoreScreen playAgain
+			if (mx >= ss.getPlayAgain().getMinX() && mx <= ss.getPlayAgain().getMaxX()
+					&& my >= ss.getPlayAgain().getMinY()
+					&& my <= ss.getPlayAgain().getMaxY()) {
+				game.setState(State.GAME);
+			}
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub.
+
+	}
+
+}

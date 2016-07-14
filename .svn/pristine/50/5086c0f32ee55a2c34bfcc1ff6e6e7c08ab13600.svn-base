@@ -1,0 +1,18 @@
+package Levels;
+
+import Game.Game;
+
+public class Level {
+	
+	private int spawnCentX, spawnCentY, spawnPlayerX, spawnPlayerY;
+	private Game game;
+	
+	public Level(Game game, String path){
+		this.game = game;
+	}
+	
+	private void loadLevel(){
+		
+	}
+
+}

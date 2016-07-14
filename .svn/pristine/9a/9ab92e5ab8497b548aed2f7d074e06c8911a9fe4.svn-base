@@ -1,0 +1,15 @@
+package Characters;
+
+public abstract class Movable {
+	public abstract void move();
+	
+	public Movable() {
+		
+	}
+	
+	public boolean collision() {
+		
+		return false;
+	}
+	
+}

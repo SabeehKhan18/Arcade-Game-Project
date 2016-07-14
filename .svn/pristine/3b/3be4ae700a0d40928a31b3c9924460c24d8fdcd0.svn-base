@@ -1,0 +1,41 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.util.concurrent.TimeUnit;
+
+import Game.Game;
+
+public class Centipede extends Movable {
+	
+	private int speed;
+	
+	public Centipede(Game game, int xSpawn, int ySpawn) {
+		super(game, xSpawn, ySpawn);
+	}
+	
+	@Override
+	public void move() {
+		
+		try {
+			TimeUnit.SECONDS.sleep(1);
+		} catch (InterruptedException exception) {
+			// TODO Auto-generated catch-block stub.
+			exception.printStackTrace();
+		}
+		x-=32;
+	}
+	
+	public void tick(){
+		move();
+	}
+	
+	public void render(Graphics2D g) {
+		g.setColor(Color.GREEN);
+		g.fillRect(x, y, 32, 32);
+		g.setColor(Color.BLACK);
+		g.drawRect(x, y, 32, 32);
+	}
+
+
+}

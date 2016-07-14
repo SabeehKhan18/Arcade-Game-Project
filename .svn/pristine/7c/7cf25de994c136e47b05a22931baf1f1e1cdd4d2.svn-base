@@ -1,0 +1,102 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+
+import Game.Game;
+import Helpers.RandomHelper;
+import Weapons.Blaster;
+import Weapons.Lancer;
+import Weapons.RYNO;
+
+public class Flea extends Movable {
+	private int x, y;
+	private final Color BODYCOLOR = Color.YELLOW;
+
+	public Flea(Game game) {
+		super(game);
+		this.y = 0;
+		this.x = RandomHelper.randRange(0, game.getHeight());
+		
+	}
+
+	@Override
+	public void tick() {
+		// TODO Auto-generated method stub.
+		this.move();
+	}
+	
+	public void move() {
+		this.y += 1;
+		if (!game.isInsideWindowY(new Point2D.Double(this.x,this.y)))
+			this.die();
+	}
+
+	@Override
+	public void render(Graphics2D g) {
+		// TODO Auto-generated method stub.
+		g.setColor(this.BODYCOLOR);
+		g.fillRect(x, y, SQUARESIZE, SQUARESIZE);
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		// TODO Auto-generated method stub.
+		return new Rectangle(this.x,this.y,SQUARESIZE,SQUARESIZE);
+	}
+
+	@Override
+	public void collide(Movable m) {
+		// nothing to do here
+
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		// TODO Auto-generated method stub.
+		p.die();
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		// nothing to do here
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		// nothing to do here
+	}
+	
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// nothing to do here
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// TODO Auto-generated method stub.
+	}
+	
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		// TODO Auto-generated method stub.
+		this.die();
+	}
+
+	@Override
+	public void collideWithRYNO(RYNO r) {
+		// TODO Auto-generated method stub.
+		this.die();
+	}
+
+
+
+	@Override
+	public void collideWithLancer(Lancer s) {
+		// TODO Auto-generated method stub.
+		this.die();
+	}
+
+}

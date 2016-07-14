@@ -1,0 +1,63 @@
+package Window;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+
+public class Menu {
+	private Game game;
+	
+	private Rectangle playButton;
+	private Rectangle helpButton;
+	private Rectangle quitButton;
+	
+	public Menu(Game game) {
+		// TODO Auto-generated constructor stub.
+		this.game = game;
+		playButton = new Rectangle(game.getWidth() / 2 - 80,
+				150,100,50);
+		helpButton = new Rectangle(game.getWidth() / 2 - 80,
+				250,100,50);
+		quitButton = new Rectangle(game.getWidth() / 2 - 80,
+				350,100,50);
+	}
+
+	public void render(Graphics g) {
+		
+		Graphics2D g2d = (Graphics2D) g;
+		
+		Font fnt0 = new Font("Times New Roman",Font.ITALIC, 50);
+		g2d.setFont(fnt0);
+		
+		g2d.setColor(Color.BLACK);
+		g2d.draw(playButton);
+		g2d.draw(helpButton);
+		g2d.draw(quitButton); 
+		
+		g2d.setColor(Color.WHITE);
+		g2d.drawString("Centipede", game.getWidth() / 2 - 110, 100);
+		Font fnt1 = new Font("Times New Roman", Font.PLAIN, 40);
+		g2d.setFont(fnt1);
+		g2d.drawString("Play", playButton.x, playButton.y + playButton.height);
+		g2d.drawString("Help", helpButton.x, helpButton.y + helpButton.height);
+		g2d.drawString("Quit", quitButton.x, quitButton.y + quitButton.height);
+		
+	}
+	
+	public Rectangle getPlayButton() {
+		return this.playButton;
+	}
+	
+	public Rectangle getHelpButton() {
+		return this.helpButton;
+	}
+	
+	public Rectangle getQuitButton() {
+		return this.quitButton;
+	}
+
+}

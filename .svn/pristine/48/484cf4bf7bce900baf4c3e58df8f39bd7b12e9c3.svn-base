@@ -1,0 +1,41 @@
+package Levels;
+
+import java.util.ArrayList;
+
+import Game.Game;
+
+public class LevelManager {
+	private Game game;
+	private Level level;
+	private ArrayList<String> levels;
+	
+	public LevelManager(Game game) {
+		this.game = game;
+		this.levels = new ArrayList<String>();
+		setLevelList();
+	}
+	private void setLevelList() {
+		this.levels.add("level1.txt");
+		this.levels.add("level2.txt");
+	}
+	
+	public void changeLevel() {
+		if (game.getKeyManager().level_up) {
+			int curr = this.levels.indexOf(level.getString());
+			level = new Level(game, levels.get(curr + 1));
+		}
+		if (game.getKeyManager().level_down) {
+			int curr = levels.indexOf(level.getString());
+			level = new Level(game, levels.get(curr - 1));
+		}
+			
+	}
+	
+	public Level getLevel() {
+		return this.level;
+	}
+
+	public void setLevelInit() {
+		level = new Level(game, levels.get(0));
+	}
+}

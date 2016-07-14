@@ -1,0 +1,198 @@
+package Game;
+
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
+
+import Characters.Centipede;
+import Characters.Movable;
+import Characters.Player;
+import Characters.Scorpion;
+import Inputs.KeyManager;
+import Levels.LevelManager;
+import Window.Display;
+
+public class Game implements Runnable {
+
+	private Display display;
+	private Thread thread;
+	private int width, height;
+	private String title;
+	private Player player;
+	private Centipede centi;
+	private Scorpion scorpio;
+	private LevelManager levelManager;
+	private KeyManager keyManager;
+	private ArrayList<Movable> movers;
+	private ArrayList<Movable> moversToAdd;
+	private ArrayList<Movable> moversToRemove;
+	
+	private BufferStrategy bs;
+	private Graphics2D g;
+	
+	private boolean running = false;
+	
+	public Game(String title, int width, int height){
+		this.title = title;
+		this.width = width;
+		this.height = height;
+		keyManager = new KeyManager(this);
+	}
+	
+	private void init(){
+		display = new Display(title, width, height);
+		display.getFrame().addKeyListener(keyManager);
+		levelManager = new LevelManager(this);
+		levelManager.setLevelInit();
+		player = new Player(this, levelManager.getLevel().getSpawnPlayerX(), levelManager.getLevel().getSpawnPlayerY());
+		centi = new Centipede(this, levelManager.getLevel().getSpawnCentX(),levelManager.getLevel().getSpawnCentY(), 8);
+		scorpio = new Scorpion(this);
+		
+		movers = new ArrayList<Movable>();
+		moversToAdd = new ArrayList<Movable>();
+		moversToRemove = new ArrayList<Movable>();
+		
+		movers.add(player);
+		movers.add(centi);
+		movers.add(scorpio);
+		
+		levelManager.getLevel().render(g);
+	}
+	
+	@Override
+	public void run() {
+		init();
+		int fps = 60;
+		double timePerTick = 1000000000/ fps;
+		double delta = 0;
+		long now;
+		long lastTime = System.nanoTime();
+		long timer = 0;
+		int ticks = 0;
+		while(running){
+			now = System.nanoTime();
+			delta += (now - lastTime)/timePerTick;
+			timer += now - lastTime;
+			lastTime = now;
+			if(delta >= 1){
+				tick();
+				collide();
+				render();
+				ticks++;
+				delta--;
+			}
+			if(timer >= 1000000000){
+//				System.out.println("FPS: " + ticks);
+				ticks = 0;
+				timer = 0;
+			}
+		}
+		stop();
+	}
+	
+	private void tick(){
+		keyManager.tick();
+		levelManager.changeLevel();
+		
+		this.movers.addAll(0, this.moversToAdd);
+		this.moversToAdd.clear();
+		this.movers.removeAll(this.moversToRemove);
+		this.moversToRemove.clear();
+		
+		for (Movable p : this.movers) {
+			p.tick();
+		}
+	}
+	
+	private void render(){
+		bs = display.getCanvas().getBufferStrategy();
+		if (bs == null) {
+			display.getCanvas().createBufferStrategy(3);
+			return;
+		}
+		g = (Graphics2D) bs.getDrawGraphics();
+		g.clearRect(0, 0, width, height);
+		
+		
+		//depending on state use different render methods
+		
+		//test
+		for (Movable p : this.movers) {
+			p.render(g);
+		}
+		
+		//always have this
+		bs.show();
+		g.dispose();
+	}
+	
+	public void collide() {
+		int moversLength = this.movers.size();
+		for (int i = 0; i < moversLength; i++) {
+			Movable thisMovable = this.movers.get(i);
+			for (int j = i+1; j < moversLength; j++) {
+				Movable thatMovable = this.movers.get(j);
+				if (thisMovable.getBounds().intersects(thatMovable.getBounds())) {
+					thisMovable.collide(thatMovable);
+				}
+			}
+		}
+	}
+	
+	public synchronized void start(){
+		running = true;
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	public synchronized void stop() {
+		running = false;
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean isInsideWindowX(Point2D point) {
+		return point.getX() >= 0 && point.getX() <= this.width;
+	}
+
+	public boolean isInsideWindowY(Point2D point) {
+		return point.getY() >= 0 && point.getY() <= this.height;
+	}
+
+	public boolean isInsideWindow(Point2D point) {
+		return isInsideWindowX(point) && isInsideWindowY(point);
+	}
+	
+	public KeyManager getKeyManager(){
+		return keyManager;
+	}
+	
+	public LevelManager getLevelManager(){
+		return levelManager;
+	}
+	
+	public void addMovable(Movable m) {
+		this.moversToAdd.add(m);
+	}
+	
+	public void removeMovable(Movable m) {
+		this.moversToRemove.add(m);
+	}
+	
+	public Player getPlayer() {
+		return player;
+	}
+	
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int getHeight() {
+		return this.height;
+	}
+
+}

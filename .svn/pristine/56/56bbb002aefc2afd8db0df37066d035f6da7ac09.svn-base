@@ -1,0 +1,94 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+import Weapons.Blaster;
+
+public class Mushroom extends Movable {
+
+	private int x,y;
+	private int damageValue;
+	
+	public Mushroom(Game game, int xLocation, int yLocation) {
+		super(game);
+		this.x = xLocation;
+		this.y = yLocation;
+		this.damageValue = 8;
+	}
+	
+	public void damage() {
+		this.damageValue--;
+		if (this.damageValue < 2) {
+			this.die();
+		}
+	}
+	
+	@Override
+	public void tick() {
+		// TODO Auto-generated method stub.
+		// Nothing to do here
+	}
+
+	@Override
+	public void render(Graphics2D g) {
+		// TODO Auto-generated method stub.
+		// Will implement when damaging mushrooms is taken into account
+		g.setColor(Color.red);
+		double fillValue = (this.damageValue/8.0)*32.0;
+		g.fillRect(this.x, this.y, 32, (int) fillValue);
+	}
+
+
+	@Override
+	public void collide(Movable m) {
+		// TODO Auto-generated method stub.
+		m.collideWithMushroom(this);
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		// TODO Auto-generated method stub.
+		p.setIsMoveValid(false);
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		// Nothing to do here
+
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		// TODO Auto-generated method stub.
+		c.setIsMoveValid(false);
+
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		// TODO Auto-generated method stub.
+		return new Rectangle(this.x, this.y, 32, 32);
+	}
+
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		// TODO Auto-generated method stub.
+		this.damage();
+	}
+
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+}

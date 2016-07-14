@@ -1,0 +1,17 @@
+We added the following:
+1.) Implemented menu screen. This was a relatively difficult task as we had to
+research how to do this. The way we did it is by wrapping the game's rendering with
+if statements and compare them to an enum value. This allows us to also render
+specific screens. Thus, by creating many if statements and separate screens, we 
+are able to create a type of menu system. 6 hours.
+2.) Sprites. This was pretty easy to implement. It was tedious to get the spritesheet
+designed correctly ("spritesheet.png") because if we do not have a proper grid
+on our sheet, then when it comes around to being rendered, some of the monsters 
+would not look as well as they do. They might have overlapping images or be 
+off-centered. 4 hours. 
+3.) Multiple bug fixes. This week we realized how poorly we designed our game.
+We found multiple issues with our code. Some of them were trickier to fix than
+others. For example, whenever the body of the centipede was hit, and a new 
+centipede would be created, the head would be a block ahead from the rest of the 
+centipede. We found that this was due to the new head being rendered much later
+than the body. We fixed this by forcing each head to be rendered first. 5 hours. 

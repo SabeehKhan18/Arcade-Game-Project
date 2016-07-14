@@ -1,0 +1,245 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+import Weapons.Blaster;
+import Weapons.Lancer;
+import Weapons.RYNO;
+
+public class Centipede extends Movable {
+	
+	protected int x, y, lastX, lastY, xSpawn, ySpawn, numBodies;
+	private int speed;
+	private int count = 0, num = 8;
+	private boolean hit, movingLeft, isMoveValid, movingDown;
+	private Centipede lastBody;
+	private Centipede after, before;
+	private final Color BODYCOLOR;
+	private final Color HEADCOLOR;
+	private final Color BODYBORDER;
+	
+	public Centipede(Game game, int xSpawn, int ySpawn, int numBodies) {
+		super(game);
+		this.x = xSpawn;
+		this.y = ySpawn;
+		this.xSpawn = xSpawn;
+		this.ySpawn = ySpawn;
+		this.lastX = this.x;
+		this.lastY = this.y;
+		this.hit = false;
+		this.movingDown = false;
+		this.movingLeft = true;
+		this.isMoveValid = true;
+		this.numBodies = numBodies;
+		this.BODYCOLOR = Color.green;
+		this.HEADCOLOR = Color.black;
+		this.BODYBORDER = Color.red;
+	}
+	
+	public void move() {
+		if(numBodies > 0){
+			if(numBodies == 8){
+				Centipede body1 = new Centipede(game, xSpawn, ySpawn, 0);
+				game.addMovable(body1);
+				body1.setBefore(this);
+//				this.headAfter = body1;
+				this.lastBody = body1;
+			}
+			else {
+				Centipede newBody = new Centipede(game, xSpawn, ySpawn, 0);
+				this.game.addMovable(newBody);
+				newBody.setBefore(this.lastBody);
+				this.lastBody.setAfter(newBody);
+				this.lastBody = newBody;
+			}
+			numBodies--;
+		}
+		if (this.before == null) {
+			headMove();
+			return;
+		}
+		bodyMove();
+	}
+	
+	public void headMove() {
+		this.isMoveValid = true;
+		this.lastX = this.x;
+		this.lastY = this.y;
+		if (hit) {
+			hit = false;
+			movingLeft = !movingLeft;
+		}
+		
+		if (movingDown) {
+			this.y += 32;
+			if (this.y >= 800 - 10*32)
+				movingDown = false;
+		}
+		if(x == this.BORDERWIDTH-32 && !movingLeft){
+			movingLeft = !movingLeft;
+			isMoveValid = false;
+			this.y += 32;
+		}
+		if(x == 0 && movingLeft){
+			movingLeft = !movingLeft;
+			isMoveValid = false;
+			this.y += 32;
+		}
+		if (movingLeft && !movingDown) {
+			x -= 32;
+		}
+		else if (!movingDown){
+			x += 32;
+		}
+	}
+	
+	public void bodyMove() {
+		this.x = before.getLastX();
+		this.y = before.getLastY();
+		this.lastX = this.x;
+		this.lastY = this.y;
+	}
+	
+	@Override
+	public void tick(){
+		//temp code
+		if(count >= 15){
+			move();
+			count = 0;
+		}
+		count++;
+	}
+	
+	public void render(Graphics2D g) {
+		if (this.before == null) {
+			headRender(g);
+			return;
+		}
+		bodyRender(g);
+	}
+	
+	public void headRender(Graphics2D g) {
+		if(!isMoveValid){
+			x = lastX;
+			y = lastY + 32;
+		}
+		g.setColor(BODYCOLOR);
+		g.fillRect(x, y, 32, 32);
+		g.setColor(HEADCOLOR);
+		g.drawRect(x, y, 32, 32);
+	}
+	
+	public void bodyRender(Graphics2D g) {
+		g.setColor(BODYCOLOR);
+		g.fillRect(x, y, 32, 32);
+		g.setColor(BODYBORDER);
+		g.drawRect(x, y, 32, 32);
+	}
+
+	@Override
+	public void die() {
+		super.die();
+		if (this.movingLeft)
+			game.createMushroom(this.x - 32, this.y);
+		else 
+			game.createMushroom(this.x + 32, this.y);
+		
+		if (this.before != null) {
+			this.before.setAfter(null);
+		}
+		if (this.after != null) {
+			this.after.setBefore(null);
+			return;
+		}
+	}
+	
+	public void setIsMoveValid(boolean value) {
+		this.isMoveValid = value;
+	}
+	
+	public void hitMushroom() {
+		this.isMoveValid = false;
+		hit = true;
+	}
+	
+	public void setAfter(Centipede after) {
+		this.after = after;
+	}
+	
+	public void setBefore(Centipede before) {
+		this.before = before;
+	}
+	
+	@Override
+	public void collide(Movable m) {
+		m.collideWithCentipede(this);
+		
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		p.die();
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+//		hit = true;
+		this.hitMushroom();
+		if (m.getPoisonedStatus()) {
+			this.movingDown = true;
+		}
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		// Nothing to do here
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		return new Rectangle(this.x, this.y, 32, 32);
+	}
+
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		this.die();
+		b.die();
+	}
+
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	public int getLastX() {
+		return this.lastX;
+	}
+
+	public int getLastY() {
+		return this.lastY;
+	}
+
+	@Override
+	public void collideWithRYNO(RYNO r) {
+		this.die();
+		r.die();
+	}
+
+	@Override
+	public void collideWithLancer(Lancer s) {
+		// TODO Auto-generated method stub.
+		this.die();
+		s.die();
+	}
+
+}

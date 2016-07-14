@@ -1,0 +1,14 @@
+package Weapons;
+
+import java.awt.Graphics2D;
+
+
+public interface Projectile {
+		
+	public void updatePosition();
+	
+	public void tick();
+	
+	public void render(Graphics2D g);
+
+}

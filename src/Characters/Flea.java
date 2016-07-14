@@ -1,0 +1,116 @@
+package Characters;
+
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+
+import Game.Game;
+import Game.Sprites;
+import Helpers.RandomHelper;
+import Weapons.Blaster;
+import Weapons.Lancer;
+import Weapons.RYNO;
+
+public class Flea extends Movable {
+	private int x, y;
+
+	public Flea(Game game) {
+		super(game);
+		this.y = 0;
+		this.x = RandomHelper.randRange(0, 25)*32;
+	}
+
+	@Override
+	public void tick() {
+		this.move();
+	}
+	
+	@Override 
+	public void die() {
+		this.game.removeMovable(this);
+		for (int k = 0; k < 3; k++) {
+			Mushroom m = new Mushroom(this.game, this.x, k*this.SQUARESIZE +this.SQUARESIZE*(Math.round(this.y/this.SQUARESIZE)));
+			this.game.addMovable(m);
+		}
+	}
+	
+	public void move() {
+		this.y += 3;
+		if (!this.game.isInsideWindowY(new Point2D.Double(this.x,this.y)))
+			this.die();
+		if (RandomHelper.randRange(0, 100) == 3) {
+			Mushroom m = new Mushroom(this.game, this.x, this.SQUARESIZE*(Math.round(this.y/this.SQUARESIZE)));
+			this.game.addMovable(m);
+		}			
+	}
+
+	@Override
+	public void render(Graphics2D g) {
+		g.drawImage(Sprites.flea, this.x, this.y, 32, 32, null);
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		// TODO Auto-generated method stub.
+		return new Rectangle(this.x,this.y,this.SQUARESIZE,this.SQUARESIZE);
+	}
+
+	@Override
+	public void collide(Movable m) {
+		m.collideWithFlea(this);
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		// TODO Auto-generated method stub.
+		p.die();
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		// nothing to do here
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		// nothing to do here
+	}
+	
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// nothing to do here
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// TODO Auto-generated method stub.
+	}
+	
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		// TODO Auto-generated method stub.
+		this.die();
+		b.die();
+	}
+
+	@Override
+	public void collideWithRYNO(RYNO r) {
+		// TODO Auto-generated method stub.
+		this.die();
+		r.die();
+	}
+
+	@Override
+	public void collideWithLancer(Lancer s) {
+		// TODO Auto-generated method stub.
+		this.die();
+		s.die();
+	}
+
+	@Override
+	public void collideWithFlea(Flea f) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+}

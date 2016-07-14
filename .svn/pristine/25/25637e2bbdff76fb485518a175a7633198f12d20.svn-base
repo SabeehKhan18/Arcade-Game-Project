@@ -1,0 +1,39 @@
+package Characters;
+
+import java.awt.Rectangle;
+import java.util.ArrayList;
+
+import Game.Game;
+
+public abstract class Movable {
+	
+	public abstract void move();
+	
+	protected Game game;
+	protected int x, y;
+	
+	public Movable(Game game, int x, int y) {
+		this.game = game;
+		this.x = x;
+		this.y = y;
+	}
+	
+	public boolean collisionMushrooms() {
+		ArrayList<Rectangle> mushrooms = game.getLevelManager().getLevel().getMushrooms();
+		for(int i = 0; i < mushrooms.size(); i++){
+			if(mushrooms.get(i).getBounds().intersects(this.getBounds())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public Rectangle getBounds(){
+		return new Rectangle(x, y, 32, 32);
+	}
+	
+	public void die(){
+		
+	}
+	
+}

@@ -1,0 +1,237 @@
+package Game;
+
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
+
+import Characters.Centipede;
+import Characters.Movable;
+import Characters.Mushroom;
+import Characters.Player;
+import Characters.Scorpion;
+import Characters.Spider;
+import Inputs.KeyManager;
+import Levels.LevelManager;
+import Weapons.Weapon;
+import Window.Display;
+
+public class Game implements Runnable {
+
+	private Display display;
+	private Thread thread;
+	private int width, height;
+	private String title;
+	private Player player;
+	private Centipede centi;
+	private Scorpion scorpio;
+	private Spider spydi;
+	private LevelManager levelManager;
+	private KeyManager keyManager;
+	private ArrayList<Movable> movers;
+	private ArrayList<Movable> moversToAdd;
+	private ArrayList<Movable> moversToRemove;
+	
+	public int mushroomCount;
+	
+	private final long STARTTIME;
+	private final long SCORPIONSPAWNTIME = 20000, SPIDERSPAWNTIME = 10000;
+	
+	private BufferStrategy bs;
+	private Graphics2D g;
+	
+	private boolean running = false;
+	private boolean hasWeapon;
+	
+	public Game(String title, int width, int height){
+		this.title = title;
+		this.width = width;
+		this.height = height;
+		keyManager = new KeyManager(this);
+		this.STARTTIME = System.currentTimeMillis();
+	}
+	
+	private void init(){
+		display = new Display(title, width, height);
+		display.getFrame().addKeyListener(keyManager);
+		levelManager = new LevelManager(this);
+		levelManager.setLevelInit();
+		player = new Player(this, levelManager.getLevel().getSpawnPlayerX(), levelManager.getLevel().getSpawnPlayerY());
+		centi = new Centipede(this, levelManager.getLevel().getSpawnCentX(),levelManager.getLevel().getSpawnCentY(), 8);
+		
+		movers = new ArrayList<Movable>();
+		moversToAdd = new ArrayList<Movable>();
+		moversToRemove = new ArrayList<Movable>();
+		
+		movers.add(player);
+		movers.add(centi);
+		
+		this.mushroomCount = getLevelManager().getLevel().getMushroomCount();
+		
+		levelManager.getLevel().render(g);
+	}
+	
+	@Override
+	public void run() {
+		init();
+		int fps = 60;
+		double timePerTick = 1000000000/ fps;
+		double delta = 0;
+		long now;
+		long lastTime = System.nanoTime();
+		long timer = 0;
+		int ticks = 0;
+		while(running){
+			now = System.nanoTime();
+			delta += (now - lastTime)/timePerTick;
+			timer += now - lastTime;
+			lastTime = now;
+			if(delta >= 1){
+				tick();
+				collide();
+				render();
+				ticks++;
+				delta--;
+			}
+			
+			if(timer >= 1000000000){
+				ticks = 0;
+				timer = 0;
+			}
+		
+		}
+		stop();
+	}
+	
+	private void tick(){
+		keyManager.tick();
+		levelManager.changeLevel();
+		
+		this.movers.addAll(0, this.moversToAdd);
+		this.moversToAdd.clear();
+		this.movers.removeAll(this.moversToRemove);
+		this.moversToRemove.clear();
+		
+		// Add a new scorpion and spider
+		// after a certain amount of time
+		long diff = System.currentTimeMillis() - this.STARTTIME;
+		if (diff % this.SCORPIONSPAWNTIME <= 20 &&
+				!this.movers.contains(scorpio) &&
+				diff > this.SCORPIONSPAWNTIME) {
+			this.scorpio = new Scorpion(this);
+			this.movers.add(this.scorpio);
+		}
+		if (diff % this.SPIDERSPAWNTIME <= 40 &&
+				!this.movers.contains(spydi) && 
+				diff > this.SPIDERSPAWNTIME) {
+			this.spydi = new Spider(this);
+			this.movers.add(this.spydi);
+		}
+		
+		
+		for (Movable p : this.movers) {
+			p.tick();
+		}
+		
+	}
+	
+	private void render(){
+		bs = display.getCanvas().getBufferStrategy();
+		if (bs == null) {
+			display.getCanvas().createBufferStrategy(3);
+			return;
+		}
+		g = (Graphics2D) bs.getDrawGraphics();
+		g.clearRect(0, 0, width, height);
+		
+		
+		for (Movable p : this.movers) {
+			p.render(g);
+		}
+		
+		//always have this
+		bs.show();
+		g.dispose();
+	}
+	
+	public void collide() {
+		this.hasWeapon = false;
+		int moversLength = this.movers.size();
+		for (int i = 0; i < moversLength; i++) {
+			Movable thisMovable = this.movers.get(i);
+			if (thisMovable.getClass().getSuperclass().equals(Weapon.class)) {
+				this.hasWeapon = true;
+			}
+			for (int j = i+1; j < moversLength; j++) {
+				Movable thatMovable = this.movers.get(j);
+				if (thisMovable.getBounds().intersects(thatMovable.getBounds())) {
+					thisMovable.collide(thatMovable);
+				}
+			}
+		}
+	}
+	
+	public synchronized void start(){
+		running = true;
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	public synchronized void stop() {
+		running = false;
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean isInsideWindowX(Point2D point) {
+		return point.getX() >= 0 && point.getX() <= this.width;
+	}
+
+	public boolean isInsideWindowY(Point2D point) {
+		return point.getY() >= 0 && point.getY() <= this.height;
+	}
+
+	public boolean isInsideWindow(Point2D point) {
+		return isInsideWindowX(point) && isInsideWindowY(point);
+	}
+	
+	public KeyManager getKeyManager(){
+		return keyManager;
+	}
+	
+	public LevelManager getLevelManager(){
+		return levelManager;
+	}
+	
+	public void addMovable(Movable m) {
+		this.moversToAdd.add(m);
+	}
+	
+	public void removeMovable(Movable m) {
+		this.moversToRemove.add(m);
+	}
+	
+	public Player getPlayer() {
+		return player;
+	}
+	
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int getHeight() {
+		return this.height;
+	}
+	
+	public boolean hasWeapon() {
+		return this.hasWeapon;
+	}
+	
+	public void createMushroom(int x, int y) {
+		addMovable(new Mushroom(this,x,y));
+	}
+	
+}

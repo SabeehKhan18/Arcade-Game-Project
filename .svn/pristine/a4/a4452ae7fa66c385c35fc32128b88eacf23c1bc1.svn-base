@@ -1,0 +1,59 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+import Game.Game;
+
+public class Body extends Centipede {
+
+	private Centipede before, after;
+	
+	public Body(Game game, int xSpawn, int ySpawn) {
+		super(game, xSpawn, ySpawn, 0);
+	}
+	
+	@Override
+	public void move(){
+		this.x = before.getLastX();
+		this.y = before.getLastY();
+		this.lastX = this.x;
+		this.lastY = this.y;
+	}
+	
+	@Override
+	public void render(Graphics2D g) {
+		g.setColor(Color.GREEN);
+		g.fillRect(x, y, 32, 32);
+		g.setColor(Color.RED);
+		g.drawRect(x, y, 32, 32);
+	}
+	
+	@Override
+	public void die() {
+		if (this.after != null) {
+			Centipede centi = new Centipede(this.game, this.after.x, this.after.y, 0);
+			game.addMovable(centi);
+			((Body)this.after).setBefore(centi);
+			centi.setHeadAfter((Body)this.after);
+		}
+		super.die();
+	}
+
+	public Centipede getBefore() {
+		return this.before;
+	}
+
+	public void setBefore(Centipede before) {
+		this.before = before;
+	}
+
+	public Centipede getAfter() {
+		return this.after;
+	}
+
+	public void setAfter(Centipede after) {
+		this.after = after;
+	}
+	
+}

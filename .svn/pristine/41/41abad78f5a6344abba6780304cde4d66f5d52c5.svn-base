@@ -1,0 +1,107 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+import Helpers.RandomHelper;
+import Weapons.Blaster;
+
+public class Scorpion extends Movable {
+	private int x;
+	private int y;
+	private int speed;
+	private boolean moveRight;
+
+	public Scorpion(Game game) {
+		 super(game);
+		 this.speed = 1;
+		 if (RandomHelper.randBoolean()) {
+			x = 0;
+			this.moveRight = true;
+		 }
+		 else {
+			 x = game.getWidth() - 32;
+			 this.moveRight = false;
+		 }
+		 this.y = RandomHelper.randRange(0, 800 - 32*10);
+	}
+	
+	public void move() {
+		if (moveRight) {
+			x += speed;
+		}
+		else {
+			x -= speed;
+		}
+		
+		if ((x == 0 && !moveRight) || (x == this.BORDERWIDTH - 32 && moveRight)) {
+			this.die();
+		}
+		
+	}
+	
+	@Override
+	public void tick() {
+		move();
+	}
+
+	@Override
+	public void render(Graphics2D g) {
+		// TODO Auto-generated method stub.
+		g.setColor(Color.ORANGE);
+		g.fillRect(x, y, 32, 32);
+		
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		// TODO Auto-generated method stub.
+		return new Rectangle(x,y,32,32);
+	}
+
+	@Override
+	public void collide(Movable m) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		// never collides with player
+
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		// randomly poisons mushroom
+		if (m.isPoisonable()) {
+			m.poison();
+		}
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		// nothing to do here
+
+	}
+
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		// TODO Auto-generated method stub.
+		this.die();
+	}
+
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// Nothing to do here
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+}

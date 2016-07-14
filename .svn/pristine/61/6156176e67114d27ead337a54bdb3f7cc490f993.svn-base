@@ -1,0 +1,214 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
+import Game.Game;
+import Weapons.Blaster;
+import Weapons.Projectile;
+
+public class Player {
+
+	private Game game;
+	private int x, y;
+	private int speed;
+	private String weapon, direction, dir2;
+	
+	public Player(Game game, int xSpawn, int ySpawn){
+		this.game = game;
+		this.x = xSpawn;
+		this.y = ySpawn;
+		this.speed = 3;
+	}
+	
+	public void tick() {
+		move();
+	}
+	
+	public void render(Graphics2D g){
+		g.setColor(Color.black);
+		g.fillRect(x, y, 32, 32);
+	}
+	
+	public void move() {
+		boolean collided = collision();
+		if (game.getKeyManager().space) {
+			shoot();
+		}
+		if(!collided){
+			dir2 = direction;
+			if (game.getKeyManager().up) {
+				y -= speed;
+				direction = "up";
+			}
+			if (game.getKeyManager().down) {
+				y += speed;
+				direction = "down";
+			}
+			if (game.getKeyManager().left) {
+				x -= speed;
+				direction = "left";
+			}
+			if (game.getKeyManager().right) {
+				x += speed;
+				direction = "right";
+			}
+		}
+		else if(collided && direction.equals("up")){
+			if (game.getKeyManager().down) {
+				y += speed;
+				direction = "down";
+			}
+			if (game.getKeyManager().left) {
+				x -= speed;
+				direction = "left";
+			}
+			if (game.getKeyManager().right) {
+				x += speed;
+				direction = "right";
+			}
+		}
+		
+		else if(collided && direction.equals("up")){
+			if (game.getKeyManager().down) {
+				y += speed;
+				direction = "down";
+			}
+			if (game.getKeyManager().left) {
+				x -= speed;
+				direction = "left";
+			}
+			if (game.getKeyManager().right) {
+				x += speed;
+				direction = "right";
+			}
+		}
+		
+		else if(collided && direction.equals("down")){
+			if (game.getKeyManager().up) {
+				y -= speed;
+				direction = "up";
+			}
+			if (game.getKeyManager().left) {
+				x -= speed;
+				direction = "left";
+			}
+			if (game.getKeyManager().right) {
+				x += speed;
+				direction = "right";
+			}
+		}
+		
+		else if(collided && direction.equals("down")){
+			if (game.getKeyManager().up) {
+				y -= speed;
+				direction = "up";
+			}
+			if (game.getKeyManager().left) {
+				x -= speed;
+				direction = "left";
+			}
+			if (game.getKeyManager().right) {
+				x += speed;
+				direction = "right";
+			}
+		}
+		
+		else if(collided && direction.equals("left")){
+			if (game.getKeyManager().down) {
+				y += speed;
+				direction = "down";
+			}
+			if (game.getKeyManager().up) {
+				y -= speed;
+				direction = "up";
+			}
+			if (game.getKeyManager().right) {
+				x += speed;
+				direction = "right";
+			}
+		}
+		
+		else if(collided && direction.equals("right")){
+			if (game.getKeyManager().down) {
+				y += speed;
+				direction = "down";
+			}
+			if (game.getKeyManager().up) {
+				y -= speed;
+				direction = "up";
+			}
+			if (game.getKeyManager().left) {
+				x -= speed;
+				direction = "left";
+			}
+		}
+	}
+	
+	public boolean collision() {
+		ArrayList<Rectangle> mushrooms = game.getLevelManager().getLevel().getMushrooms();
+		for(int i = 0; i < mushrooms.size(); i++){
+			if(mushrooms.get(i).getBounds().intersects(this.getBounds())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void shoot(){
+		System.out.println("Tried to fire gun");
+		Projectile p = new Blaster(new Point2D.Double(x,y));
+		game.addProjectile(p);
+		/*
+		try {
+			// Get the Class for the Ball
+			Class<? extends Projectile> projectileClass;
+			try {
+				projectileClass = Class.forName(this.weapon).asSubclass(Projectile.class);
+			} catch (ClassCastException e) {
+				// Oops. It's not a subclass of Ball.
+				throw new ClassCastException("Not a subclass of Projectile");
+			} catch (NoClassDefFoundError e) {
+				throw new NoClassDefFoundError("Class not defined");
+			}
+
+			// Make sure it is not abstract
+			if (Modifier.isAbstract(projectileClass.getModifiers())) {
+				System.out.println("Class is abstract");
+				return;
+			}
+
+			// Use reflection to get the Ball's constructor.
+			Constructor<? extends Projectile> constructor;
+			Class<?>[] parameters = { Projectile.class };
+			constructor = projectileClass.getConstructor(parameters);
+
+			// Construct a new instance of the ball and add it to the
+			// environment
+			Projectile b = constructor.newInstance(new Point2D.Double(this.x, this.y));
+			// this.game.addProjectile(b);
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			System.out.println("Could not create projectile");
+			
+		}
+		*/
+
+	}
+	
+	public void die(){
+		
+	}
+	
+	public void changeWeapon(){
+		
+	}
+	
+	public Rectangle getBounds(){
+		return new Rectangle(x, y, 32, 32);
+	}
+
+}

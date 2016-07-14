@@ -1,0 +1,88 @@
+package Inputs;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import Game.Game;
+import Game.Game.State;
+import Window.Menu;
+import Window.ScoreScreen;
+
+public class MouseInput implements MouseListener {
+	private Menu menu;
+	private Game game;
+	private ScoreScreen ss;
+	
+	public MouseInput(Game game) {
+		this.game = game;
+		this.menu = game.getMenu();
+		this.ss = game.getScoreScreen();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@SuppressWarnings("unqualified-field-access")
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+		int mx = e.getX();
+		int my = e.getY();
+		if (this.game.getState() == State.MENU) {
+			// Play Button
+			if (mx >= this.menu.getPlayButton().getMinX() && mx <= this.menu.getPlayButton().getMaxX()
+					&& my >= this.menu.getPlayButton().getMinY() 
+					&& my <= this.menu.getPlayButton().getMaxY()) {
+				this.game.setState(State.GAME);
+			}
+			// Help Button
+			if (mx >= this.menu.getHelpButton().getMinX() && mx <= this.menu.getHelpButton().getMaxX()
+					&& my >= this.menu.getHelpButton().getMinY() 
+					&& my <= this.menu.getHelpButton().getMaxY()) {
+				this.game.setState(State.HELP);
+			}
+			// Quit Button
+			if (mx >= this.menu.getQuitButton().getMinX() && mx <= this.menu.getQuitButton().getMaxX()
+					&& my >= this.menu.getQuitButton().getMinY() 
+					&& my <= this.menu.getQuitButton().getMaxY()) {
+				this.game.setState(State.EXIT);
+			}
+		}
+		if (this.game.getState() == State.SCORESCREEN) {
+			//ScoreScreen toHome
+			if (mx >= this.ss.getToHome().getMinX() && mx <= this.ss.getToHome().getMaxX()
+					&& my >= this.ss.getToHome().getMinY() 
+					&& my <= this.ss.getToHome().getMaxY()) {
+				this.game.setState(State.MENU);
+			}
+			//ScoreScreen playAgain
+			if (mx >= this.ss.getPlayAgain().getMinX() && mx <= this.ss.getPlayAgain().getMaxX()
+					&& my >= this.ss.getPlayAgain().getMinY()
+					&& my <= this.ss.getPlayAgain().getMaxY()) {
+				this.game.setState(State.GAME);
+			}
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub.
+
+	}
+
+}

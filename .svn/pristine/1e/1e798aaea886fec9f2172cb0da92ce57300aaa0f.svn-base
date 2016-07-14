@@ -1,0 +1,11 @@
+As of 11:00 AM, on this day of 5/6/15, we have some implementation 
+of the following:
+1.) Collision, but spaceship can move diagonally through
+2.) Switching and Loading levels
+3.) Firing with one weapon
+
+Our collision is really bad, as we test many cases. We should create 
+a method that will detect collision of everything and return boolean.
+This will be implemented in Movable. 
+
+

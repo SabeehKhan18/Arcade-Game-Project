@@ -1,0 +1,80 @@
+package Weapons;
+
+import java.awt.Graphics2D;
+
+import Characters.Centipede;
+import Characters.Movable;
+import Characters.Mushroom;
+import Characters.Player;
+import Characters.Scorpion;
+import Characters.Spider;
+import Game.Game;
+
+public abstract class Weapon extends Movable {
+	
+	
+	
+	public Weapon(Game game) {
+		super(game);
+		// TODO Auto-generated constructor stub.
+	}
+	
+	public abstract void tick();
+
+	public abstract void render(Graphics2D g);
+
+	@Override
+	public void collide(Movable m) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithRYNO(RYNO r) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// TODO Auto-generated method stub.
+
+	}
+
+	@Override
+	public void collideWithLancer(Lancer s) {
+		// TODO Auto-generated method stub.
+
+	}
+
+}

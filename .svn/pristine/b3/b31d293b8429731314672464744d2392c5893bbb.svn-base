@@ -1,0 +1,120 @@
+package Weapons;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Characters.Centipede;
+import Characters.Flea;
+import Characters.Movable;
+import Characters.Mushroom;
+import Characters.Player;
+import Characters.Scorpion;
+import Characters.Spider;
+import Game.Game;
+
+public class RYNO extends Weapon {
+
+	private int locationX, locationY;
+	private boolean dead;
+	
+	public static final int SPEED = 20;
+	public static final int HEIGHT = 20;
+	public static final int WIDTH = 5*HEIGHT;
+	
+	private final Color FILLCOLOR = Color.yellow;
+	
+	
+	public RYNO(Game game, int x, int y) {
+		super(game);
+		for (int k = -2; k <= 2; k++) {
+			Blaster b = new Blaster(game, x, y, k*5, this.FILLCOLOR);
+			this.game.addMovable(b);
+		}
+		this.die();
+	}
+
+	@Override
+	public void tick() {
+		// Nothing to do here
+	}
+
+	@Override
+	public void render(Graphics2D g) {
+		// Nothing to do here
+	}
+	
+	@Override
+	public void die() {
+		super.die();
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		return new Rectangle(this.locationX, this.locationY, WIDTH, HEIGHT);
+	}
+
+	@Override
+	public void collide(Movable m) {
+		m.collideWithRYNO(this);
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		if (!this.dead) {
+			m.damage();
+			this.die();
+		}
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		if (!this.dead) {
+			this.die();
+			c.die();
+		}
+	}
+
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithRYNO(RYNO r) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithLancer(Lancer s) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithFlea(Flea f) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+}

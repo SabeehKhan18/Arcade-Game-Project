@@ -1,0 +1,90 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+import Weapons.Blaster;
+import Weapons.RYNO;
+
+public class Spider extends Movable {
+
+	private int x, y;
+	private final Color BODYCOLOR;
+	
+	public Spider(Game game) {
+		super(game);
+		this.BODYCOLOR = Color.blue;
+	}
+	
+	@Override
+	public void tick() {
+		// Auto-generated method stub.
+		this.move();
+	}
+	
+	public void move() {
+		
+	}
+
+	@Override
+	public void render(Graphics2D g) {
+		// Auto-generated method stub.
+		
+	}
+
+
+	@Override
+	public Rectangle getBounds() {
+		// TODO Auto-generated method stub.
+		return null;
+	}
+
+	@Override
+	public void collide(Movable m) {
+		// TODO Auto-generated method stub.
+		m.collideWithSpider(this);
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		p.die();
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithBlaster(Blaster b) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithScorpion(Scorpion s) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithSpider(Spider sp) {
+		// Nada
+	}
+
+	@Override
+	public void collideWithRYNO(RYNO r) {
+		r.die();
+	}
+
+
+}

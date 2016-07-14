@@ -1,0 +1,87 @@
+package Characters;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import Game.Game;
+
+public class Centipede implements Movable {
+	
+	private Game game;
+	private int x,y;
+	private int speed;
+	private int count = 0;
+	
+	public Centipede(Game game, int xSpawn, int ySpawn) {
+//		super(game, xSpawn, ySpawn);
+		this.game = game;
+		this.x = xSpawn; this.y = ySpawn;
+	}
+	
+	public void move() {
+		
+//		try {
+//			TimeUnit.SECONDS.sleep(1);
+//		} catch (InterruptedException exception) {
+//			// TODO Auto-generated catch-block stub.
+//			exception.printStackTrace();
+//		}
+		x-=32;
+	}
+	
+	@Override
+	public void tick(){
+		//temp code
+		if(count >= 15){
+			move();
+			count = 0;
+		}
+		count++;
+	}
+	
+	public void render(Graphics2D g) {
+		g.setColor(Color.GREEN);
+		g.fillRect(x, y, 32, 32);
+		g.setColor(Color.BLACK);
+		g.drawRect(x, y, 32, 32);
+	}
+
+	@Override
+	public void die() {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collide(Movable m) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithPlayer(Player p) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithMushroom(Mushroom m) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public void collideWithCentipede(Centipede c) {
+		// TODO Auto-generated method stub.
+		
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		// TODO Auto-generated method stub.
+		return new Rectangle(this.x, this.y, 32, 32);
+	}
+
+
+}

@@ -1,0 +1,31 @@
+package Weapons;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+
+public class Blaster implements Projectile {
+	
+	private Point2D.Double location;
+	
+	public static final int SPEED = 5;
+	public static final int WIDTH = 20;
+	public static final int HEIGHT = 2*WIDTH;
+	
+	public Blaster(Point2D.Double startPosition) {
+		this.location = startPosition;
+	}
+
+	@Override
+	public void tick() {
+		double newY = this.location.getY() - SPEED;
+		this.location = new Point2D.Double(this.location.getX(), newY);
+	}
+
+	@Override
+	public void render(Graphics2D g) {
+		g.setColor(Color.pink);
+		g.fillOval((int) this.location.getX(), (int) this.location.getY(), WIDTH, HEIGHT);
+	}
+
+}
