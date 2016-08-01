@@ -4,7 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
+import java.io.File;
 import java.util.ArrayList;
+
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import Characters.Centipede;
 import Characters.Flea;
@@ -435,6 +439,25 @@ public class Game implements Runnable {
 	
 	public WinScreen getWinScreen() {
 		return this.winScreen;
+	}
+	
+	public static synchronized void playSound(String link) {
+		new Thread(new Runnable() {
+			  // The wrapper thread is unnecessary, unless it blocks on the
+			  // Clip finishing; see comments.
+			    public void run() {
+			      try {
+			    	  	File file = new File(link);
+			    	  	Clip clip = AudioSystem.getClip();
+			    	  	clip.open(AudioSystem.getAudioInputStream(file));
+			    	  	clip.start();
+			    	    
+			    	    Thread.sleep(clip.getMicrosecondLength() / 1000);
+			      } catch (Exception e) {
+			        System.err.println(e.getMessage());
+			      }
+			    }
+			  }).start();
 	}
 
 }

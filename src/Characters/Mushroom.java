@@ -44,6 +44,7 @@ public class Mushroom extends Movable {
 	public void damage() {
 		this.damageValue--;
 		if (this.damageValue <= 0) {
+			
 			this.die();
 		}
 	}
