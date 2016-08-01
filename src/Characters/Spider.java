@@ -15,6 +15,7 @@ public class Spider extends Movable {
 
 	private int initY, x, y, diagHeight, speed;
 	private boolean moveDiag;
+	private static final String soundPath = "sounds\\Ratchet_&_Clank_(USA)_(En,Fr,De,Es,It).iso_03332.wav";
 	
 	public Spider(Game game) {
 		super(game);
@@ -57,9 +58,13 @@ public class Spider extends Movable {
 	@Override
 	public void render(Graphics2D g) {
 		// Auto-generated method stub.
-//		g.setColor(BODYCOLOR);
-//		g.fillRect(this.x, this.y, SQUARESIZE, SQUARESIZE);
 		g.drawImage(Sprites.spider, this.x, this.y, 32, 32, null);
+	}
+	
+	@Override
+	public void die() {
+		game.playSound(soundPath);
+		super.die();
 	}
 
 
