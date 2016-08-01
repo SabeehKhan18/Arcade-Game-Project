@@ -13,6 +13,7 @@ import Weapons.RYNO;
 
 public class Flea extends Movable {
 	private int x, y;
+	private final static String dominatingPath = "sounds\\dominating.WAV";
 
 	public Flea(Game game) {
 		super(game);
@@ -32,6 +33,7 @@ public class Flea extends Movable {
 			Mushroom m = new Mushroom(this.game, this.x, k*this.SQUARESIZE +this.SQUARESIZE*(Math.round(this.y/this.SQUARESIZE)));
 			this.game.addMovable(m);
 		}
+		this.game.playSound(dominatingPath);
 	}
 	
 	public void move() {

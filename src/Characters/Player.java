@@ -17,6 +17,7 @@ public class Player extends Movable {
 	private int speed, weaponNumber, deathCount;
 	private boolean isMoveValid, isDead;
 	private Weapon w;
+	private final static String dominatingPath = "sounds\\floop_sfx.WAV";
 	public Player(Game game, int xSpawn, int ySpawn){
 		super(game);
 		this.x = xSpawn; this.y = ySpawn;
@@ -96,6 +97,7 @@ public class Player extends Movable {
 	@Override
 	public void die() {
 		this.isDead = true;
+		this.game.playSound(dominatingPath);
 	}
 	
 	public void setIsMoveValid(boolean value) {
