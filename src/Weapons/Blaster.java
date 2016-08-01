@@ -23,6 +23,7 @@ public class Blaster extends Weapon {
 	public static final int SPEED = 20;
 	public static final int WIDTH = 20;
 	public static final int HEIGHT = 2*WIDTH;
+	private static final String soundPath = "sounds\\9_mm_gunshot-mike-koenig-123.wav";
 	
 	
 	public Blaster(Game game, int x, int y) {
@@ -59,6 +60,7 @@ public class Blaster extends Weapon {
 
 	@Override
 	public void die() {
+		game.playSound(soundPath);
 		super.die();
 		this.dead = true;
 	}
